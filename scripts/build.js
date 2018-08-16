@@ -47,26 +47,26 @@ measureFileSizesBeforeBuild(paths.appBuild)
   .then(previousFileSizes => {
     // Remove all content but keep the directory so that
     // if you're in it, you don't end up in Trash
-    fs.emptyDirSync(paths.appBuild);
+    fs.emptyDirSync(paths.appBuild); //会清空 build 文件
     // Merge with the public folder
     copyPublicFolder();
     // Start the webpack build
     return build(previousFileSizes);
   })
   .then(
-    ({ stats, previousFileSizes, warnings }) => {
+    ({stats, previousFileSizes, warnings}) => {
       if (warnings.length) {
         console.log(chalk.yellow('Compiled with warnings.\n'));
         console.log(warnings.join('\n\n'));
         console.log(
           '\nSearch for the ' +
-            chalk.underline(chalk.yellow('keywords')) +
-            ' to learn more about each warning.'
+          chalk.underline(chalk.yellow('keywords')) +
+          ' to learn more about each warning.'
         );
         console.log(
           'To ignore, add ' +
-            chalk.cyan('// eslint-disable-next-line') +
-            ' to the line before.\n'
+          chalk.cyan('// eslint-disable-next-line') +
+          ' to the line before.\n'
         );
       } else {
         console.log(chalk.green('Compiled successfully.\n'));
@@ -101,13 +101,10 @@ measureFileSizesBeforeBuild(paths.appBuild)
     }
   );
 
-// Create the production build and print the deployment instructions.
-function build(previousFileSizes) {
-  console.log('Creating an optimized production build...');
 
-  let compiler = webpack([config,es5config]);
+function compiler(config, previousFileSizes) {
   return new Promise((resolve, reject) => {
-    compiler.run((err, stats) => {
+    config.run((err, stats) => {
       if (err) {
         return reject(err);
       }
@@ -129,7 +126,7 @@ function build(previousFileSizes) {
         console.log(
           chalk.yellow(
             '\nTreating warnings as errors because process.env.CI = true.\n' +
-              'Most CI servers set it automatically.\n'
+            'Most CI servers set it automatically.\n'
           )
         );
         return reject(new Error(messages.warnings.join('\n\n')));
@@ -141,7 +138,21 @@ function build(previousFileSizes) {
       });
     });
   });
+
 }
+
+// Create the production build and print the deployment instructions.
+async function build(previousFileSizes) {
+  console.log('Creating an optimized production build...');
+
+  // let compiler = webpack([config,es5config]);
+  let modernConfig = webpack(config);
+  let es5Config = webpack(es5config)
+  let result = await compiler(es5Config, previousFileSizes);
+  result = await compiler(modernConfig, previousFileSizes);
+  return result
+}
+
 
 function copyPublicFolder() {
   fs.copySync(paths.appPublic, paths.appBuild, {

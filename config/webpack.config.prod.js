@@ -17,6 +17,9 @@ const getClientEnvironment = require('./env');
 const publicPath = paths.servedPath;
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
+const fs = require('fs')
+
+
 // Some apps do not use client-side routing with pushState.
 // For these, "homepage" can be set to "." to enable relative asset paths.
 const shouldUseRelativeAssetPaths = publicPath === './';
@@ -58,7 +61,8 @@ module.exports = {
   devtool: false,
   // In production, we only want to load the polyfills and the app code.
   entry: {
-    main: [require.resolve('./polyfills'), paths.appIndexJs]
+    main: [require.resolve('./polyfills'), paths.appIndexJs],
+    // main: paths.appIndexJs
   },
   output: {
     // The build folder.
@@ -77,6 +81,7 @@ module.exports = {
         .replace(/\\/g, '/'),
   },
   resolve: {
+    symlinks: true,
     // This allows you to set a fallback for where Webpack should look for modules.
     // We placed these paths second because we want `node_modules` to "win"
     // if there are any conflicts. This matches Node resolution mechanism.
@@ -104,7 +109,7 @@ module.exports = {
       // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
       // please link the files into your node_modules/ and let module-resolution kick in.
       // Make sure your source files are compiled, as they will not be processed in any way.
-      new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson]),
+      // new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson]),
     ],
   },
   module: {
@@ -149,6 +154,11 @@ module.exports = {
           // Process JS with Babel.
           {
             test: /\.(js|jsx|mjs)$/,
+            // test: function(module){
+            //   console.log(module)
+            //   return  /\.(js|jsx|mjs)$/.test(module)
+            // },
+            // issuer: paths.appIndexJs,
             // include: paths.appSrc,
             loader: require.resolve('babel-loader'),
             options: {
@@ -262,7 +272,11 @@ module.exports = {
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
       inject: true,
-      template: paths.appHtml,
+      // template: paths.appHtml,
+      // template: `${paths.appBuild}/index.html`,
+      // template: `src/index.html`,
+      // template: `build/index.html`,
+      template: fs.existsSync(`${paths.appBuild}/index.html`) ? `${paths.appBuild}/index.html` : paths.appHtml,
       minify: {
         removeComments: true,
         collapseWhitespace: true,
