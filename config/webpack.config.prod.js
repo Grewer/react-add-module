@@ -16,7 +16,7 @@ const getClientEnvironment = require('./env');
 // It requires a trailing slash, or the file assets will get an incorrect path.
 const publicPath = paths.servedPath;
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-
+const htmlWebpackAddModulePlugin = require('html-webpack-add-module-plugin')
 const fs = require('fs')
 
 
@@ -263,6 +263,9 @@ module.exports = {
     ],
   },
   plugins: [
+    new htmlWebpackAddModulePlugin({
+      module:'all',
+    }),
     // Makes some environment variables available in index.html.
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
     // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">

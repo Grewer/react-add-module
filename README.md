@@ -1,12 +1,15 @@
 ## react-add-module
 
-### notice:
+### Notice:
 
 optimize.UglifyJsPlugin 不支持 压缩es6及以上的代码
 
 uglifyjs-webpack-plugin 该插件可支持 es6 的压缩
 
-### 待解决问题
 
-1. 已可生成不同的 js  版本,但是 css  没有合并
-2. 生成的 index.html  只有一个版本,待解决
+解决 css 的问题,但是 es5 的代码大小不会打印出来
+
+### Impression
+算是一种生硬的实现方案,异步组件和 webpack 4的异步组件还未测试 
+webpack 重复生成,会减慢 build 的时间  
+vue-cli3 已经有了这种方式,期待下 react-script 的官方指令

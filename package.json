@@ -84,12 +84,14 @@
   "eslintConfig": {
     "extends": "react-app"
   },
+  "homepage": ".",
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
     "fs-extra": "^3.0.1",
+    "html-webpack-add-module-plugin": "^1.0.3",
     "uglifyjs-webpack-plugin": "^1.2.7"
   }
 }

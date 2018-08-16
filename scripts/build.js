@@ -54,7 +54,7 @@ measureFileSizesBeforeBuild(paths.appBuild)
     return build(previousFileSizes);
   })
   .then(
-    ({stats, previousFileSizes, warnings}) => {
+    ({stats, previousFileSizes, warnings, prevResult}) => {
       if (warnings.length) {
         console.log(chalk.yellow('Compiled with warnings.\n'));
         console.log(warnings.join('\n\n'));
@@ -80,7 +80,6 @@ measureFileSizesBeforeBuild(paths.appBuild)
         WARN_AFTER_BUNDLE_GZIP_SIZE,
         WARN_AFTER_CHUNK_GZIP_SIZE
       );
-      console.log();
 
       const appPackage = require(paths.appPackageJson);
       const publicUrl = paths.publicUrl;
@@ -102,7 +101,7 @@ measureFileSizesBeforeBuild(paths.appBuild)
   );
 
 
-function compiler(config, previousFileSizes) {
+function compiler(config, previousFileSizes, prevResult) {
   return new Promise((resolve, reject) => {
     config.run((err, stats) => {
       if (err) {
@@ -131,11 +130,17 @@ function compiler(config, previousFileSizes) {
         );
         return reject(new Error(messages.warnings.join('\n\n')));
       }
-      return resolve({
+      // console.log(stats)
+      let result = {
         stats,
         previousFileSizes,
         warnings: messages.warnings,
-      });
+      }
+
+      if (prevResult) {
+        result.prevResult = prevResult
+      }
+      return resolve(result);
     });
   });
 
@@ -145,11 +150,16 @@ function compiler(config, previousFileSizes) {
 async function build(previousFileSizes) {
   console.log('Creating an optimized production build...');
 
-  // let compiler = webpack([config,es5config]);
   let modernConfig = webpack(config);
   let es5Config = webpack(es5config)
   let result = await compiler(es5Config, previousFileSizes);
-  result = await compiler(modernConfig, previousFileSizes);
+  // remove main.es5.css
+  let arr = Object.keys(result.stats.compilation.assets)
+  const path = arr.find(v => v.indexOf('css') > -1 && v.indexOf('main') > -1)
+  await fs.remove(result.previousFileSizes.root + '/' + path)
+
+  result = await compiler(modernConfig, previousFileSizes, result);
+
   return result
 }
 

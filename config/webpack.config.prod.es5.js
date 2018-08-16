@@ -16,6 +16,8 @@ const getClientEnvironment = require('./env');
 // It requires a trailing slash, or the file assets will get an incorrect path.
 const publicPath = paths.servedPath;
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const htmlWebpackAddModulePlugin = require('html-webpack-add-module-plugin')
+
 
 // Some apps do not use client-side routing with pushState.
 // For these, "homepage" can be set to "." to enable relative asset paths.
@@ -251,6 +253,10 @@ module.exports = {
     ],
   },
   plugins: [
+    new htmlWebpackAddModulePlugin({
+      nomodule:'all',
+      removeCSS:'main'
+    }),
     // Makes some environment variables available in index.html.
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
     // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
