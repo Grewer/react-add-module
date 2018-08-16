@@ -60,7 +60,7 @@ module.exports = {
   devtool: false,
   // In production, we only want to load the polyfills and the app code.
   entry: {
-    'main.es5': [require.resolve('./polyfills'), paths.appIndexJs]
+    'main.es5': [require.resolve('./polyfills'),"babel-polyfill", paths.appIndexJs]
   },
   output: {
     // The build folder.
