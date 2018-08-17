@@ -168,7 +168,7 @@ module.exports = {
                 }],
                 "react"
               ],
-              plugins: ["transform-class-properties"],
+              plugins: ["transform-class-properties", "syntax-dynamic-import"],
               compact: true,
             },
           },
@@ -254,8 +254,8 @@ module.exports = {
   },
   plugins: [
     new htmlWebpackAddModulePlugin({
-      nomodule:'all',
-      removeCSS:'main'
+      nomodule: 'all',
+      removeCSS: 'main'
     }),
     // Makes some environment variables available in index.html.
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
