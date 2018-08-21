@@ -109,7 +109,7 @@ module.exports = {
       // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
       // please link the files into your node_modules/ and let module-resolution kick in.
       // Make sure your source files are compiled, as they will not be processed in any way.
-      // new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson]),
+      new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson]),
     ],
   },
   module: {
@@ -154,12 +154,6 @@ module.exports = {
           // Process JS with Babel.
           {
             test: /\.(js|jsx|mjs)$/,
-            // test: function(module){
-            //   console.log(module)
-            //   return  /\.(js|jsx|mjs)$/.test(module)
-            // },
-            // issuer: paths.appIndexJs,
-            // include: paths.appSrc,
             loader: require.resolve('babel-loader'),
             options: {
               presets: [
@@ -275,10 +269,6 @@ module.exports = {
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
       inject: true,
-      // template: paths.appHtml,
-      // template: `${paths.appBuild}/index.html`,
-      // template: `src/index.html`,
-      // template: `build/index.html`,
       template: fs.existsSync(`${paths.appBuild}/index.html`) ? `${paths.appBuild}/index.html` : paths.appHtml,
       minify: {
         removeComments: true,

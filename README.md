@@ -64,3 +64,55 @@ es6:
 es5:  
 0.chunk.js : 2k
 
+## 修改过程: 
+首先下载需要的包:  
+下面列出:
+- "babel-core": "^6.26.0"
+- "babel-plugin-syntax-dynamic-import": "^6.18.0"
+- "babel-plugin-transform-class-properties": "^6.24.1"
+- "babel-polyfill": "^6.26.0"
+- "babel-preset-env": "^1.7.0"
+- "babel-preset-react": "^6.24.1"
+- "html-webpack-add-module-plugin": "^1.0.3"
+- "uglifyjs-webpack-plugin": "^1.2.7"
+
+去除 package.json 中的 babel 参数  
+
+复制 /config/webpack.config.prod.js 一份在当前目录, 命名为 webpack.config.prod.es5.js
+
+在 prod.js 中:  
+添加引用:
+```js
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const htmlWebpackAddModulePlugin = require('html-webpack-add-module-plugin')
+const fs = require('fs')
+```
+说明:  
+> UglifyJsPlugin 是因为 webpack.optimize.UglifyJsPlugin 无法压缩 es6 以上的代码所以需要该插件
+htmlWebpackAddModulePlugin 是可以将 生成的 script 转换为 module 或者 nomodule 的插件
+fs 是可以对于文件进行一系列操作,这里只是用来判断文件是否存在
+
+修改代码:  
+修改 oneOf 中的 `test: /\.(js|jsx|mjs)$/` 该 loader 将其 options 改为
+```js
+            options: {
+              presets: [
+                ['env', {
+                  modules: false,
+                  useBuiltIns: true,
+                  targets: {
+                    browsers: [
+                      'Chrome >= 60',
+                      'Safari >= 10.1',
+                      'iOS >= 10.3',
+                      'Firefox >= 54',
+                      'Edge >= 15',
+                    ]
+                  },
+                }],
+                "react",
+              ],
+              plugins: ["transform-class-properties", "syntax-dynamic-import"],
+              compact: true
+            }
+```
