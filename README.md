@@ -15,7 +15,7 @@ Vue-cli3 already has this way, looking forward to the official command of react-
 
 Solve the problem of css, but the code size of es5 will not be printed
 
-### Build Results
+### Build  notices
 Although there is a specification now, the JS of the module must add the mjs suffix, but if you do this, you can't run the HTML file after the build locally, you must run it on the server, otherwise you will get an error.
 
 ```
@@ -333,9 +333,9 @@ vue-cli3 已经有了这种方式,期待下 react-script 的官方指令
 
 解决 css 的问题,但是 es5 的代码大小不会打印出来
 
-### Build 结果
-虽然现在有规范, module 的 JS 都要添加 mjs 后缀,但是现如果这么做,那么就不能在本地运行 build 之后的 HTML 文件,必须运行在服务器上,否则会报错
+### Build 注意点
 
+虽然现在有一个规范，模块的JS必须添加mjs后缀，但是如果这样做，你不能在本地构建后运行HTML文件，你必须在服务器上运行它，否则你报错:
 ```
 Failed to load module script: The server responded with a non-JavaScript MIME type of "application/octet-stream". Strict MIME type checking is enforced for module scripts per HTML spec.
 ```
