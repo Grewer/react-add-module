@@ -8,7 +8,7 @@
 
 ### in conclusion
 
-Is a blunt implementation, asynchronous components and asynchronous components of webpack 4 have not been tested
+Is a blunt implementation, asynchronous components of webpack 4 have not been tested
 Webpack is generated repeatedly, which will slow down the build time.
 
 Vue-cli3 already has this way, looking forward to the official command of react-script
@@ -326,7 +326,7 @@ The basic changes are here, then run the command: `npm run build`
 
 ### 结论
 
-算是一种生硬的实现方案,异步组件和 webpack 4的异步组件还未测试 
+算是一种生硬的实现方案,webpack 4的异步组件还未测试 
 webpack 重复生成,会减慢 build 的时间  
 
 vue-cli3 已经有了这种方式,期待下 react-script 的官方指令  
