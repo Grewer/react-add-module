@@ -65,7 +65,7 @@ es5:
 0.chunk.js : 2k
 
 ## 修改过程: 
-首先下载需要的包:  
+#### 首先下载需要的包:  
 下面列出:
 - "babel-core": "^6.26.0"
 - "babel-plugin-syntax-dynamic-import": "^6.18.0"
@@ -80,7 +80,7 @@ es5:
 
 复制 /config/webpack.config.prod.js 一份在当前目录, 命名为 webpack.config.prod.es5.js
 
-在 prod.js 中:  
+#### 在 prod.js 中:  
 添加引用:
 ```js
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
@@ -89,7 +89,7 @@ const fs = require('fs')
 ```
 说明:  
 > UglifyJsPlugin 是因为 webpack.optimize.UglifyJsPlugin 无法压缩 es6 以上的代码所以需要该插件
-htmlWebpackAddModulePlugin 是可以将 生成的 script 转换为 module 或者 nomodule 的插件
+htmlWebpackAddModulePlugin 是可以将 生成的 script 转换为 module 或者 nomodule 的插件  
 fs 是可以对于文件进行一系列操作,这里只是用来判断文件是否存在
 
 修改代码:  
@@ -116,3 +116,59 @@ fs 是可以对于文件进行一系列操作,这里只是用来判断文件是�
               compact: true
             }
 ```
+
+在 plugins 中添加插件:  
+```js
+    new htmlWebpackAddModulePlugin({
+      module: 'all',
+    }),
+    new UglifyJsPlugin(),
+```
+注释 webpack.optimize.UglifyJsPlugin 插件:  
+```js
+    // new webpack.optimize.UglifyJsPlugin({
+    //   compress: {
+    //     warnings: false,
+    //     // Disabled because of an issue with Uglify breaking seemingly valid code:
+    //     // https://github.com/facebookincubator/create-react-app/issues/2376
+    //     // Pending further investigation:
+    //     // https://github.com/mishoo/UglifyJS2/issues/2011
+    //     comparisons: false,
+    //   },
+    //   mangle: {
+    //     safari10: true,
+    //   },
+    //   output: {
+    //     comments: false,
+    //     // Turned on because emoji and regex is not minified properly using default
+    //     // https://github.com/facebookincubator/create-react-app/issues/2488
+    //     ascii_only: true,
+    //   },
+    //   sourceMap: shouldUseSourceMap,
+    // }),
+```
+修改 HtmlWebpackPlugin 插件为:
+```js
+    new HtmlWebpackPlugin({
+      inject: true,
+      template: fs.existsSync(`${paths.appBuild}/index.html`) ? `${paths.appBuild}/index.html` : paths.appHtml,
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
+      },
+    }),
+```
+
+**webpack.config.prod.js的修改到此为止**
+
+#### 在 webpack.config.prod.es5.js 中修改
+
+TODO 
