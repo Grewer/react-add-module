@@ -1,5 +1,9 @@
 # react-add-module
 
+## Language
+- <a href="#english">English</a>
+- <a href="#chinese">Chinese</a>
+
 # English
 
 ### in conclusion
@@ -86,9 +90,9 @@ const htmlWebpackAddModulePlugin = require('html-webpack-add-module-plugin')
 const fs = require('fs')
 ```
 Description:
-> UglifyJsPlugin is because webpack.optimize.UglifyJsPlugin can't compress es6 or above code, so the plugin is needed
-htmlWebpackAddModulePlugin is a plugin that can convert generated scripts to module or nomodule
-Fs is a series of operations on the file, here is only used to determine whether the file exists
+> UglifyJsPlugin is because webpack.optimize.UglifyJsPlugin can't compress es6 or above code, so the plugin is needed   
+htmlWebpackAddModulePlugin is a plugin that can convert generated scripts to module or nomodule   
+Fs is a series of operations on the file, here is only used to determine whether the file exists  
 
 Modify the code:
 Modify `test: /\.(js|jsx|mjs)$/` in oneOf to change its options to
