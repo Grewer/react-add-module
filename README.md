@@ -116,6 +116,7 @@ fs 是可以对于文件进行一系列操作,这里只是用来判断文件是�
               compact: true
             }
 ```
+可以将 `include: paths.appSrc` 去除 
 
 在 plugins 中添加插件:  
 ```js
@@ -169,6 +170,149 @@ fs 是可以对于文件进行一系列操作,这里只是用来判断文件是�
 
 **webpack.config.prod.js的修改到此为止**
 
+---
+
 #### 在 webpack.config.prod.es5.js 中修改
 
-TODO 
+添加包引用:
+```js
+const htmlWebpackAddModulePlugin = require('html-webpack-add-module-plugin')
+```
+修改入口名:
+```js
+  entry: {
+    'main.es5': [require.resolve('./polyfills'),"babel-polyfill", paths.appIndexJs]
+  },
+```
+
+与之前一样的修改 oneOf 中的 babel loader 的 options:
+```js
+            options: {
+              presets: [
+                ['env', {
+                  modules: false,
+                  useBuiltIns: true,
+                  targets: {
+                    browsers: [
+                      "> 1%",
+                      'last 2 version',
+                      'firefox ESR'
+                    ]
+                  },
+                }],
+                "react"
+              ],
+              plugins: ["transform-class-properties", "syntax-dynamic-import"],
+              compact: true,
+            },
+```
+添加插件:
+```js
+    new htmlWebpackAddModulePlugin({
+      nomodule: 'all',
+      removeCSS: 'main'
+    }),
+```
+
+**webpack.config.prod.es5.js的修改到此为止**
+
+---
+
+### 开始修改 /scripts/build.js 文件:
+
+添加 es5 config 文件的引用:
+```js
+const es5config = require('../config/webpack.config.prod.es5');
+```
+
+在 build 函数之前添加函数:
+```js
+function compiler(config, previousFileSizes, prevResult) {
+  return new Promise((resolve, reject) => {
+    config.run((err, stats) => {
+      if (err) {
+        return reject(err);
+      }
+      const messages = formatWebpackMessages(stats.toJson({}, true));
+      if (messages.errors.length) {
+        // Only keep the first error. Others are often indicative
+        // of the same problem, but confuse the reader with noise.
+        if (messages.errors.length > 1) {
+          messages.errors.length = 1;
+        }
+        return reject(new Error(messages.errors.join('\n\n')));
+      }
+      if (
+        process.env.CI &&
+        (typeof process.env.CI !== 'string' ||
+          process.env.CI.toLowerCase() !== 'false') &&
+        messages.warnings.length
+      ) {
+        console.log(
+          chalk.yellow(
+            '\nTreating warnings as errors because process.env.CI = true.\n' +
+            'Most CI servers set it automatically.\n'
+          )
+        );
+        return reject(new Error(messages.warnings.join('\n\n')));
+      }
+      // console.log(stats)
+      let result = {
+        stats,
+        previousFileSizes,
+        warnings: messages.warnings,
+      }
+
+      if (prevResult) {
+        result.prevResult = prevResult
+      }
+      return resolve(result);
+    });
+  });
+
+}
+```
+修改刚刚的 build 函数为:
+```js
+async function build(previousFileSizes) {
+  console.log('Creating an optimized production build...');
+
+  let modernConfig = webpack(config);
+  let es5Config = webpack(es5config)
+  let result = await compiler(es5Config, previousFileSizes);
+  // remove main.es5.css
+  let arr = Object.keys(result.stats.compilation.assets)
+  const path = arr.find(v => v.indexOf('css') > -1 && v.indexOf('main') > -1)
+  await fs.remove(result.previousFileSizes.root + '/' + path)
+
+  result = await compiler(modernConfig, previousFileSizes, result);
+
+  return result
+}
+```
+在 /public/index.html 中的 <div id="root"></div>后面添加:
+```js
+<script>
+      (function() {
+        var check = document.createElement('script');
+        if (!('noModule' in check) && 'onbeforeload' in check) {
+          var support = false;
+          document.addEventListener('beforeload', function(e) {
+            if (e.target === check) {
+              support = true;
+            } else if (!e.target.hasAttribute('nomodule') || !support) {
+              return;
+            }
+            e.preventDefault();
+          }, true);
+          check.type = 'module';
+          check.src = '.';
+          document.head.appendChild(check);
+          check.remove();
+        }
+      }());
+    </script>
+```
+解决 safari 的重复加载问题
+
+基础的修改到此为止了,接下来运行指令 : `npm run build` 即可
